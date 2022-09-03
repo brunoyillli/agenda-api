@@ -2,12 +2,15 @@ package io.github.brunoyillli.agenda.api.rest;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 import java.util.Optional;
 
 import javax.servlet.http.Part;
 
 import org.apache.tomcat.util.http.fileupload.IOUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -46,8 +49,13 @@ public class ContatoController {
 	}
 
 	@GetMapping
-	public List<Contato> list() {
-		return repository.findAll();
+	public Page<Contato> list(
+			@RequestParam(value = "page", defaultValue =  "0") Integer pagina, 
+			@RequestParam(value = "size", defaultValue = "10") Integer tamanhoPagina
+		) {
+		Sort sort = Sort.by(Direction.ASC, "nome");
+		PageRequest pageRequest = PageRequest.of(pagina, tamanhoPagina, sort);
+		return repository.findAll(pageRequest);
 	}
 
 	@PutMapping("{id}/favorito")
